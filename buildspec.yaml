@@ -20,7 +20,7 @@ phases:
   build:
     commands:
       - echo Building user service...
-      - docker build -t $USER_IMAGE:latest ./user-service
+      - docker build -t $USER_IMAGE:latest ecommerce-microservice-app/user-service
       - docker tag $USER_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$USER_IMAGE:latest
       - docker tag $USER_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$USER_IMAGE:$IMAGE_TAG
 
