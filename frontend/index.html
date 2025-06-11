@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Microservices Demo</title>
+</head>
+<body>
+    <h1>Microservices Demo</h1>
+
+    <button onclick="fetchUser()">Get User</button>
+    <button onclick="fetchProduct()">Get Product</button>
+    <button onclick="fetchOrder()">Get Order</button>
+
+    <div id="output"></div>
+
+    <script>
+        function fetchUser() {
+            fetch('http://localhost:5001/user')
+                .then(response => response.json())
+                .then(data => document.getElementById('output').innerText = JSON.stringify(data));
+        }
+
+        function fetchProduct() {
+            fetch('http://localhost:5002/product')
+                .then(response => response.json())
+                .then(data => document.getElementById('output').innerText = JSON.stringify(data));
+        }
+
+        function fetchOrder() {
+            fetch('http://localhost:5003/order')
+                .then(response => response.json())
+                .then(data => document.getElementById('output').innerText = JSON.stringify(data));
+        }
+    </script>
+</body>
+</html>
