@@ -6,16 +6,18 @@ env:
 
 phases:
   install:
-    commands:    
-      - echo Installing dependencies...
-      - curl -Lo kubectl \
-         -L https://amazon-eks.s3.us-west-2.amazonaws.com/1.27.2/2023-06-09/bin/linux/amd64/kubectl
-      - test $(wc -c < kubectl) -gt 10000000 || ( echo "kubectl download failed!" >&2; exit 1 )  # Downloads the kubectl binary (the Kubernetes command-line tool) from Amazon’s official EKS download link for Kubernetes version 1.27.2.
-      - chmod +x ./kubectl                  
-      - mv ./kubectl /usr/local/bin
-      - curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.27.2/2023-06-09/bin/linux/amd64/aws-iam-authenticator   #AWS IAM Authenticator binary for Kubernetes.This tool allows kubectl to authenticate with Amazon EKS clusters using IAM credentials.
-      - chmod +x ./aws-iam-authenticator     # verifies the file is >10 MB (~real kubectl size); if it’s smaller, it bails out.
-      - mv ./aws-iam-authenticator /usr/local/bin
+    commands:
+      - echo Installing dependencies via AWS CLI…
+      # Install kubectl for EKS
+      - aws eks install-cli --install-dir /usr/local/bin --bin-name kubectl
+      - kubectl version --client
+
+      # Install aws-iam-authenticator
+      - curl -Lo aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.27.2/2023-06-09/bin/linux/amd64/aws-iam-authenticator
+      - chmod +x aws-iam-authenticator
+      - mv aws-iam-authenticator /usr/local/bin/
+      - aws-iam-authenticator help
+
   pre_build:
     commands:
       - echo Logging in to Docker Hub...
