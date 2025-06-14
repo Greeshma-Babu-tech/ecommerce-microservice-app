@@ -61,6 +61,10 @@ phases:
 
   post_build:
     commands:
+      - echo Verifying Kubernetes connection...
+      - kubectl config current-context
+      - kubectl get nodes
+      
       - echo Updating Kubernetes deployments...
       - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
       - kubectl set image deployment/product-service product-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:latest
