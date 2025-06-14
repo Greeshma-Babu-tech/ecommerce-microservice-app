@@ -69,7 +69,8 @@ phases:
       - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
       - export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
       - export AWS_STS_REGIONAL_ENDPOINTS=regional
-      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION --role-arn arn:aws:iam::$AWS_ACCOUNT_ID:role/service-role/codebuild-ecommerce-microservice-service-role
+
       - export KUBECONFIG=$HOME/.kube/config
       - aws eks get-token --cluster-name $EKS_CLUSTER_NAME --region $AWS_REGION # test token generation
   
