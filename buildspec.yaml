@@ -4,7 +4,6 @@ env:
   variables:
     AWS_REGION: "us-east-1"
     EKS_CLUSTER_NAME: "ecommerce-app-cluster"  # Replace with your EKS cluster name
-    ECR_URI: "235494787301.dkr.ecr.us-east-1.amazonaws.com/ecommerce"  # Replace with your AWS Account ID
 
 phases:
   pre_build:
@@ -60,10 +59,10 @@ phases:
   post_build:
     commands:
       - echo Updating Kubernetes deployments...
-      - kubectl set image deployment/user-service user-service=$ECR_URI/user-service:latest
-      - kubectl set image deployment/product-service product-service=$ECR_URI/product-service:latest
-      - kubectl set image deployment/order-service order-service=$ECR_URI/order-service:latest
-      - kubectl set image deployment/frontend frontend=$ECR_URI/frontend:latest
+      - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
+      - kubectl set image deployment/product-service product-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:latest
+      - kubectl set image deployment/order-service order-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:latest
+      - kubectl set image deployment/frontend frontend=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:latest
       - echo All deployments updated successfully.
       - echo Build and deployment completed.
     
