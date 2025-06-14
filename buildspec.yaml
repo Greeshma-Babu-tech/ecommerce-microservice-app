@@ -17,6 +17,7 @@ phases:
 
       - echo Configuring kubectl to connect to the EKS cluster...
       - aws eks update-kubeconfig --region $AWS_REGION  --name $EKS_CLUSTER_NAME
+      - export AWS_STS_REGIONAL_ENDPOINTS=regional
 
   build:
     commands:
