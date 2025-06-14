@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: product-service
+  labels:
+    app: product-service
 spec:
   replicas: 2
   selector:
@@ -13,20 +15,28 @@ spec:
         app: product-service
     spec:
       containers:
-      - name: product-service
-        image: my-product-service-image
-        ports:
-        - containerPort: 5002
+        - name: product-service
+          image: 235494787301.dkr.ecr.us-east-1.amazonaws.com/ecommerce/product-service:latest  # Replace with your ECR URI
+          ports:
+            - containerPort: 5002
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          imagePullPolicy: Always
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: product-service
 spec:
+  type: ClusterIP
   selector:
     app: product-service
   ports:
     - protocol: TCP
       port: 5002
       targetPort: 5002
-  type: LoadBalancer

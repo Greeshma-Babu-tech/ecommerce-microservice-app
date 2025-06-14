@@ -2,16 +2,15 @@ version: 0.2
 
 env:
   variables:
-    AWS_ACCOUNT_ID: "235494787301"          # Replace with your AWS Account ID
-    AWS_REGION: "us-east-1"                 # Replace with your AWS Region
-    USER_IMAGE: "user-service"
-    PRODUCT_IMAGE: "product-service"
-    ORDER_IMAGE: "order-service"
-    FRONTEND_IMAGE: "frontend"
+    AWS_REGION: "us-east-1"
+    EKS_CLUSTER_NAME: "ecommerce-app-cluster"  # Replace with your EKS cluster name
+    ECR_URI: "235494787301.dkr.ecr.us-east-1.amazonaws.com/ecommerce"  # Replace with your AWS Account ID
 
 phases:
   pre_build:
     commands:
+      - echo Logging in to Docker Hub...
+      - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
@@ -20,47 +19,56 @@ phases:
   build:
     commands:
       - echo Building user service...
-      - docker build -t $USER_IMAGE:latest ecommerce-microservice-app/user-service
-      - docker tag $USER_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$USER_IMAGE:latest
-      - docker tag $USER_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$USER_IMAGE:$IMAGE_TAG
+      - docker build -t $USER_IMAGE:latest ./user-service
+      - docker tag $USER_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
+      - docker tag $USER_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:$IMAGE_TAG
 
       - echo Building product service...
       - docker build -t $PRODUCT_IMAGE:latest ./product-service
-      - docker tag $PRODUCT_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PRODUCT_IMAGE:latest
-      - docker tag $PRODUCT_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PRODUCT_IMAGE:$IMAGE_TAG
+      - docker tag $PRODUCT_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:latest
+      - docker tag $PRODUCT_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:$IMAGE_TAG
 
       - echo Building order service...
       - docker build -t $ORDER_IMAGE:latest ./order-service
-      - docker tag $ORDER_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ORDER_IMAGE:latest
-      - docker tag $ORDER_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ORDER_IMAGE:$IMAGE_TAG
+      - docker tag $ORDER_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:latest
+      - docker tag $ORDER_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:$IMAGE_TAG
 
       - echo Building frontend service...
       - docker build -t $FRONTEND_IMAGE:latest ./frontend
-      - docker tag $FRONTEND_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_IMAGE:latest
-      - docker tag $FRONTEND_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_IMAGE:$IMAGE_TAG
+      - docker tag $FRONTEND_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:latest
+      - docker tag $FRONTEND_IMAGE:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG
+
+            - echo Pushing all images to Amazon ECR...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:$IMAGE_TAG
+
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:$IMAGE_TAG
+
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:$IMAGE_TAG
+
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG
+
+      - echo Creating imagedefinitions.json for CodePipeline deployment...
+      - printf '[{"name":"user-service","imageUri":"%s"}' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:$IMAGE_TAG" > imagedefinitions.json
+      - printf ',{"name":"product-service","imageUri":"%s"}' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
+      - printf ',{"name":"order-service","imageUri":"%s"}' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
+      - printf ',{"name":"frontend","imageUri":"%s"}]' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
 
   post_build:
     commands:
-      - echo Pushing all images to Amazon ECR...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$USER_IMAGE:latest
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$USER_IMAGE:$IMAGE_TAG
+      - echo Updating Kubernetes deployments...
+      - kubectl set image deployment/user-service user-service=$ECR_URI/user-service: latest
+      - kubectl set image deployment/product-service product-service=$ECR_URI/product-service: latest
+      - kubectl set image deployment/order-service order-service=$ECR_URI/order-service: latest
+      - kubectl set image deployment/frontend frontend=$ECR_URI/frontend: latest
+      - echo All deployments updated successfully.
+      - echo Build and deployment completed.
+    
 
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PRODUCT_IMAGE:latest
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PRODUCT_IMAGE:$IMAGE_TAG
-
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ORDER_IMAGE:latest
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ORDER_IMAGE:$IMAGE_TAG
-
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_IMAGE:latest
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_IMAGE:$IMAGE_TAG
-
-
-      - echo Creating imagedefinitions.json for CodePipeline deployment...
-      - printf '[{"name":"user-service","imageUri":"%s"}]' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$USER_IMAGE:$IMAGE_TAG" > imagedefinitions.json
-      - printf ',{"name":"product-service","imageUri":"%s"}' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PRODUCT_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
-      - printf ',{"name":"order-service","imageUri":"%s"}' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ORDER_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
-      - printf ',{"name":"frontend","imageUri":"%s"}]' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
 
 artifacts:
   files:
-    - imagedefinitions.json #CodeBuild will upload this file to the S3 bucket configured in your CodePipeline.
+    - imagedefinitions.json

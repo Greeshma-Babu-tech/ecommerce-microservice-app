@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: frontend
   labels:
-    app: order-service
+    app: frontend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: order-service
+      app: frontend
   template:
     metadata:
       labels:
-        app: order-service
+        app: frontend
     spec:
       containers:
-        - name: order-service
-          image: 235494787301.dkr.ecr.us-east-1.amazonaws.com/ecommerce/order-service:latest  # Replace with your ECR URI
+        - name: frontend
+          image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/ecommerce/frontend:latest  # Replace with your actual ECR URI
           ports:
-            - containerPort: 5003
+            - containerPort: 5000
           resources:
             requests:
               memory: "128Mi"
@@ -31,12 +31,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: order-service
+  name: frontend-service
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
-    app: order-service
+    app: frontend
   ports:
     - protocol: TCP
-      port: 5003
-      targetPort: 5003
+      port: 80
+      targetPort: 5000
