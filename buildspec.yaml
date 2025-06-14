@@ -62,9 +62,10 @@ phases:
   post_build:
     commands:
       - echo Verifying Kubernetes connection...
-      - kubectl config current-context
+      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+      - export KUBECONFIG=$HOME/.kube/config
       - kubectl get nodes
-      
+  
       - echo Updating Kubernetes deployments...
       - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
       - kubectl set image deployment/product-service product-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:latest
@@ -72,6 +73,7 @@ phases:
       - kubectl set image deployment/frontend frontend=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:latest
       - echo All deployments updated successfully.
       - echo Build and deployment completed.
+
     
 artifacts:
   files:
