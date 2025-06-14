@@ -16,9 +16,7 @@ phases:
       - IMAGE_TAG=$COMMIT_HASH
 
       - echo Configuring kubectl to connect to the EKS cluster...
-      - aws eks update-kubeconfig \
-          --region $AWS_REGION \
-          --name $EKS_CLUSTER_NAME
+      - aws eks update-kubeconfig --region $AWS_REGION  --name $EKS_CLUSTER_NAME
 
   build:
     commands:
