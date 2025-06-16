@@ -5,6 +5,11 @@ env:
     EKS_CLUSTER_NAME: "ecommerce-app-cluster"
 
 phases:
+  install:
+    runtime-versions:
+      kubectl: 1.29
+    commands:
+      - aws eks update-kubeconfig --region us-east-1 --name ecommerce-app-cluster
   pre_build:
     commands:
       - echo Logging in to Docker Hub...
