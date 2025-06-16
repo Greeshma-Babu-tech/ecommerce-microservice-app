@@ -15,11 +15,6 @@ phases:
       
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=$COMMIT_HASH
-
-      - echo Configuring kubectl to connect to the EKS cluster...
-      - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
-      - export AWS_STS_REGIONAL_ENDPOINTS=regional
-
   build:
     commands:
       - echo Building user service...
@@ -64,6 +59,9 @@ phases:
   post_build:
     commands:
       - echo Verifying Kubernetes connection...
+      - echo Configuring kubectl to connect to the EKS cluster...
+      - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
+      - export AWS_STS_REGIONAL_ENDPOINTS=regional
       - kubectl config current-context
       - echo Updating Kubernetes deployments...
       - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
