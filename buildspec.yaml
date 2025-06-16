@@ -63,6 +63,7 @@ phases:
       - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
       - export AWS_STS_REGIONAL_ENDPOINTS=regional
       - kubectl config current-context
+      
       - echo Updating Kubernetes deployments...
       - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
       - kubectl rollout status deployment/user-service
