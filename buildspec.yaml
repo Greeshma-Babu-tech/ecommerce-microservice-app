@@ -64,6 +64,7 @@ phases:
   post_build:
     commands:
       - echo Verifying Kubernetes connection...
+      - kubectl config current-context
       - echo Updating Kubernetes deployments...
       - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
       - kubectl rollout status deployment/user-service
