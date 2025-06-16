@@ -68,8 +68,8 @@ phases:
       - export KUBECONFIG=/root/.kube/config
       - echo "Verifying cluster access"
       - aws sts get-caller-identity
-      - aws eks get-token --cluster-name $EKS_CLUSTER_NAME --region $AWS_REGION
-      - kubectl get nodes
+      - export TOKEN=$(aws eks get-token --cluster-name $EKS_CLUSTER_NAME --region $AWS_REGION --output json | jq -r '.status.token')
+      - kubectl get nodes --token $TOKEN
       
       - echo Pulling the built image from ECR...
       - docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
