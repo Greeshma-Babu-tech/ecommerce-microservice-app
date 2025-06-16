@@ -66,12 +66,24 @@ phases:
       - echo Verifying Kubernetes connection...
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
       - kubectl get pods --all-namespaces
+      - echo Pulling the built image from ECR...
+      - docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
+      - docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:latest
+      - docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:latest
+      - docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:latest
 
       - echo Updating Kubernetes deployments...
       - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
+      - kubectl rollout status deployment/user-service
+      
       - kubectl set image deployment/product-service product-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:latest
+      - kubectl rollout status deployment/product-service
+      
       - kubectl set image deployment/order-service order-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:latest
+      - kubectl rollout status deployment/order-service
+      
       - kubectl set image deployment/frontend frontend=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:latest
+      - kubectl rollout status deployment/frontend
       
       - echo All deployments updated successfully.
       - echo Build and deployment completed.
