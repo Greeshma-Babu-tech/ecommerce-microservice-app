@@ -68,6 +68,7 @@ phases:
       - export KUBECONFIG=/root/.kube/config
       - echo "Verifying cluster access"
       - aws sts get-caller-identity
+      - aws eks get-token --cluster-name $EKS_CLUSTER_NAME --region $AWS_REGION
       - kubectl get nodes
       
       - echo Pulling the built image from ECR...
