@@ -66,9 +66,7 @@ phases:
       - echo Verifying Kubernetes connection...
       - export KUBECONFIG=/root/.kube/config
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
-      - CLUSTER_ENDPOINT=$(aws eks describe-cluster --name $EKS_CLUSTER_NAME --region $AWS_REGION --query "cluster.endpoint" --output text)
-      - TOKEN=$(aws eks get-token --cluster-name $EKS_CLUSTER_NAME --region $AWS_REGION --query 'status.token' --output text)
-      - kubectl --server=$CLUSTER_ENDPOINT --token=$TOKEN get nodes
+      - kubectl get nodes
       
       - echo Pulling the built image from ECR...
       - docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
