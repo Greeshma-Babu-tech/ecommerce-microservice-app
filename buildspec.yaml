@@ -90,7 +90,7 @@ phases:
       
       - echo All deployments updated successfully.
       - echo Build and deployment completed.
-
+      
 artifacts:
   files:
     - imagedefinitions.json
