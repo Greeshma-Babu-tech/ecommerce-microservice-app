@@ -64,12 +64,11 @@ phases:
   post_build:
     commands:
       - echo Verifying Kubernetes connection...
-      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
       - export KUBECONFIG=/root/.kube/config
-      - echo "Verifying cluster access"
-      - aws sts get-caller-identity
-      - export TOKEN=$(aws eks get-token --cluster-name $EKS_CLUSTER_NAME --region $AWS_REGION --output json | jq -r '.status.token')
-      - kubectl get nodes --token $TOKEN
+      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+      - CLUSTER_ENDPOINT=$(aws eks describe-cluster --name $EKS_CLUSTER_NAME --region $AWS_REGION --query "cluster.endpoint" --output text)
+      - TOKEN=$(aws eks get-token --cluster-name $EKS_CLUSTER_NAME --region $AWS_REGION --query 'status.token' --output text)
+      - kubectl --server=$CLUSTER_ENDPOINT --token=$TOKEN get nodes
       
       - echo Pulling the built image from ECR...
       - docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
