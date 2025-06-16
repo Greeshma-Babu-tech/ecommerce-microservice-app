@@ -5,14 +5,17 @@ env:
     EKS_CLUSTER_NAME: "ecommerce-app-cluster"
 
 phases:
-  install:
-    commands:
-      - echo Installing kubectl...
-      - curl -o kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.29.0/2024-03-22/bin/linux/amd64/kubectl
-      - chmod +x ./kubectl
-      - mv ./kubectl /usr/local/bin
-      - echo Updating kubeconfig...
-      - aws eks update-kubeconfig --region us-east-1 --name ecommerce-app-cluster
+install:
+  commands:
+    - echo Installing kubectl...
+    - KUBECTL_VERSION="v1.29.0"
+    - curl -LO "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl"
+    - curl -LO "https://dl.k8s.io/$KUBECTL_VERSION/bin/linux/amd64/kubectl.sha256"
+    - echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+    - chmod +x kubectl
+    - mv kubectl /usr/local/bin/
+    - kubectl version --client
+
   pre_build:
     commands:
       - echo Logging in to Docker Hub...
