@@ -57,13 +57,7 @@ phases:
       - printf ',{"name":"frontend","imageUri":"%s"}]' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
       
   post_build:
-    commands:
-      - echo Verifying Kubernetes connection...
-      - echo Configuring kubectl to connect to the EKS cluster...
-      - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
-      - export AWS_STS_REGIONAL_ENDPOINTS=regional
-      - kubectl config current-context
-      
+    commands:      
       - echo Updating Kubernetes deployments...
       - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:latest
       - kubectl rollout status deployment/user-service
