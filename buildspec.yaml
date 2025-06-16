@@ -65,6 +65,10 @@ phases:
     commands:
       - echo Verifying Kubernetes connection...
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+      - aws sts get-caller-identity
+      - kubectl config view
+      - kubectl version
+
       - kubectl get nodes
       
       - echo Updating Kubernetes deployments...
