@@ -6,9 +6,12 @@ env:
 
 phases:
   install:
-    runtime-versions:
-      kubectl: 1.29
     commands:
+      - echo Installing kubectl...
+      - curl -o kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.29.0/2024-03-22/bin/linux/amd64/kubectl
+      - chmod +x ./kubectl
+      - mv ./kubectl /usr/local/bin
+      - echo Updating kubeconfig...
       - aws eks update-kubeconfig --region us-east-1 --name ecommerce-app-cluster
   pre_build:
     commands:
