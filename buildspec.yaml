@@ -57,10 +57,18 @@ phases:
       - printf ',{"name":"order-service","imageUri":"%s"}' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
       - printf ',{"name":"frontend","imageUri":"%s"}]' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
       
-post_build:
+  post_build:
     commands:
-      - echo Updating Kubernetes deployments..
+      - echo Applying Kubernetes manifests...
       - kubectl apply -f k8s-manifests/
+
+      - echo Updating Kubernetes deployments with new images...
+      - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:$IMAGE_TAG
+      - kubectl set image deployment/product-service product-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:$IMAGE_TAG
+      - kubectl set image deployment/order-service order-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:$IMAGE_TAG
+      - kubectl set image deployment/frontend-service frontend-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG
+
+      - echo Deployment updated successfully.
       
 artifacts:
   files:
