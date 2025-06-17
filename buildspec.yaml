@@ -50,13 +50,7 @@ phases:
 
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:latest
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG
-
-      - echo Creating imagedefinitions.json for CodePipeline deployment...
-      - printf '[{"name":"user-service","imageUri":"%s"}' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:$IMAGE_TAG" > imagedefinitions.json
-      - printf ',{"name":"product-service","imageUri":"%s"}' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
-      - printf ',{"name":"order-service","imageUri":"%s"}' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
-      - printf ',{"name":"frontend","imageUri":"%s"}]' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
-      
+    
   post_build:
     commands:
       - echo Verifying Kubernetes connection...
@@ -72,4 +66,3 @@ phases:
       
 artifacts:
   files:
-    - imagedefinitions.json
