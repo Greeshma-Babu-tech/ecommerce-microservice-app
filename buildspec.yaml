@@ -59,10 +59,10 @@ phases:
   post_build:
     commands:
       - echo Applying initial deployments...
-      - kubectl apply -f k8s/user-service-deployment.yaml
-      - kubectl apply -f k8s/product-service-deployment.yaml
-      - kubectl apply -f k8s/order-service-deployment.yaml
-      - kubectl apply -f k8s/frontend-deployment.yaml
+      - kubectl apply -f k8s-manifests/user-service-deployment.yaml
+      - kubectl apply -f k8s-manifests/product-service-deployment.yaml
+      - kubectl apply -f k8s-manifests/order-service-deployment.yaml
+      - kubectl apply -f k8s-manifests/frontend-deployment.yaml
     
       - echo Verifying deployments...
       - kubectl rollout status deployment/user-service
