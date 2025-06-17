@@ -59,6 +59,7 @@ phases:
   post_build:
     commands:
       - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
+      - aws sts get-caller-identity
       - echo Applying initial deployments...
       - kubectl apply -f k8s-manifests/user-deployment.yaml
       - kubectl apply -f k8s-manifests/product-deployment.yaml
