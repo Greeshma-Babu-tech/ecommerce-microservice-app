@@ -78,8 +78,8 @@ phases:
       - kubectl set image deployment.apps/product-service product-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:$IMAGE_TAG
       - kubectl set image deployment.apps/order-service order-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:$IMAGE_TAG
       - kubectl set image deployment.apps/frontend frontend=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG
-
       - echo Deployment updated successfully.
+      - kubectl get svc
       
 artifacts:
   files:
