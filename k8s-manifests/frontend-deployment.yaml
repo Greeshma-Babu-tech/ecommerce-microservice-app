@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/ecommerce/frontend:latest  # Replace with your actual ECR URI
+          image: 235494787301.dkr.ecr.us-east-1.amazonaws.com/ecommerce/frontend:latest  # Replace with your actual ECR URI
           ports:
             - containerPort: 5000
           resources:
