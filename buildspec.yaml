@@ -62,10 +62,10 @@ phases:
       - aws sts get-caller-identity
       - echo Applying initial deployments...
       - kubectl apply -f k8s-manifests/user-deployment.yaml --validate=false
-      - kubectl apply -f k8s-manifests/product-deployment.yaml --validate=false
-      - kubectl apply -f k8s-manifests/order-deployment.yaml --validate=false
-      - kubectl apply -f k8s-manifests/frontend-deployment.yaml --validate=false
-    
+      - kubectl apply -f k8s-manifests/product-deployment.yaml 
+      - kubectl apply -f k8s-manifests/order-deployment.yaml 
+      - kubectl apply -f k8s-manifests/frontend-deployment.yaml 
+      
       - echo Verifying deployments...
       - kubectl rollout status deployment/user-service
       - kubectl rollout status deployment/product-service
