@@ -3,6 +3,8 @@ version: 0.2
 env:
   variables:
     EKS_CLUSTER_NAME: "ecommerce-app-cluster"
+    AWS_ACCOUNT_ID: "235494787301"
+    AWS_REGION: "us-east-1"
 
 phases:
   pre_build:
