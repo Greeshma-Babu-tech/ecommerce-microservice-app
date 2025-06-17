@@ -66,6 +66,7 @@ phases:
       - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
       - export KUBECONFIG=/root/.kube/config 
       - kubectl config view
+      - aws sts get-caller-identity
       - kubectl -n kube-system get configmap aws-auth -o yaml
 
       - echo Applying Kubernetes manifests...
