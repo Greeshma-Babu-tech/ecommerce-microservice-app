@@ -15,6 +15,7 @@ phases:
       
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=$COMMIT_HASH
+      - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
   build:
     commands:
       - echo Building user service...
@@ -56,21 +57,13 @@ phases:
       - printf ',{"name":"order-service","imageUri":"%s"}' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
       - printf ',{"name":"frontend","imageUri":"%s"}]' "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG" >> imagedefinitions.json
       
-  post_build:
+post_build:
     commands:
-      - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
-      - aws sts get-caller-identity
-      - echo Applying initial deployments...
-      - kubectl apply -f k8s-manifests/user-deployment.yaml --validate=false
-      - kubectl apply -f k8s-manifests/product-deployment.yaml 
-      - kubectl apply -f k8s-manifests/order-deployment.yaml 
-      - kubectl apply -f k8s-manifests/frontend-deployment.yaml 
-      - echo Verifying deployments...
-      - kubectl rollout status deployment/user-service
-      - kubectl rollout status deployment/product-service
-      - kubectl rollout status deployment/order-service
-      - kubectl rollout status deployment/frontend
-      - echo Initial deployments completed successfully.
+      - echo Updating Kubernetes deployments...
+      - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:$IMAGE_TAG
+      - kubectl set image deployment/product-service product-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:$IMAGE_TAG
+      - kubectl set image deployment/order-service order-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:$IMAGE_TAG
+      - kubectl set image deployment/frontend-service frontend-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG
       
 artifacts:
   files:
