@@ -5,6 +5,7 @@ env:
     EKS_CLUSTER_NAME: "ecommerce-app-cluster"
     AWS_ACCOUNT_ID: "235494787301"
     AWS_REGION: "us-east-1"
+    KUBECONFIG: "/root/.kube/config"
 
 phases:
   pre_build:
@@ -63,8 +64,11 @@ phases:
     commands:
       - echo Verifying Kubernetes connection...
       - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
+      - export KUBECONFIG=/root/.kube/config 
       - kubectl config view
       - kubectl -n kube-system get configmap aws-auth -o yaml
+
+      - echo Applying Kubernetes manifests...
       - kubectl apply -f k8s-manifests/
       - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
       - echo Updating Kubernetes deployments with new images...
