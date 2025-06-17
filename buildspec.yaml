@@ -72,11 +72,13 @@ phases:
       - echo Applying Kubernetes manifests...
       - kubectl apply -f k8s-manifests/
       - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
+      
       - echo Updating Kubernetes deployments with new images...
-      - kubectl set image deployment.apps/user-service user=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:$IMAGE_TAG
+      - kubectl set image deployment.apps/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:$IMAGE_TAG
       - kubectl set image deployment.apps/product-service product=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:$IMAGE_TAG
       - kubectl set image deployment.apps/order-service order=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$ORDER_IMAGE:$IMAGE_TAG
       - kubectl set image deployment.apps/frontend frontend=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$FRONTEND_IMAGE:$IMAGE_TAG
+
       - echo Deployment updated successfully.
       
 artifacts:
