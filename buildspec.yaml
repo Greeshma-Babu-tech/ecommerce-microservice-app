@@ -64,7 +64,7 @@ phases:
       - echo Verifying Kubernetes connection...
       - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
       - kubectl config view
-      - kubectl
+      - kubectl -n kube-system get configmap aws-auth -o yaml
       - kubectl apply -f k8s-manifests/
       - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
       - echo Updating Kubernetes deployments with new images...
