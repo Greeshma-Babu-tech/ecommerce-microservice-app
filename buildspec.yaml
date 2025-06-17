@@ -59,8 +59,6 @@ phases:
       
   post_build:
     commands:
-      - echo Applying Kubernetes manifests...
-      - kubectl apply -f k8s-manifests/
 
       - echo Updating Kubernetes deployments with new images...
       - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:$IMAGE_TAG
