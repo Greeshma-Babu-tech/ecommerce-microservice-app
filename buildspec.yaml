@@ -63,9 +63,10 @@ phases:
     commands:
       - echo Verifying Kubernetes connection...
       - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
-      - export KUBECONFIG=/root/.kube/config
       - kubectl config view
       - kubectl
+      - kubectl apply -f k8s-manifests/
+      - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
       - echo Updating Kubernetes deployments with new images...
       - kubectl set image deployment/user-service user-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$USER_IMAGE:$IMAGE_TAG
       - kubectl set image deployment/product-service product-service=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ecommerce/$PRODUCT_IMAGE:$IMAGE_TAG
