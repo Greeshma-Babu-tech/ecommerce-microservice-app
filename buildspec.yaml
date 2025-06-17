@@ -53,7 +53,8 @@ phases:
     
   post_build:
     commands:
-      - echo Verifying Kubernetes connection...aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
+      - echo Verifying Kubernetes connection...
+      - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
       - export KUBECONFIG=/root/.kube/config
       - kubectl get nodes
       - echo Updating Kubernetes deployments with new images...
