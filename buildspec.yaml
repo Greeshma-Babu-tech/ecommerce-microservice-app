@@ -60,7 +60,7 @@ phases:
   post_build:
     commands:
       - echo Verifying Kubernetes connection...
-      - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
+      - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME --role-arn arn:aws:iam::235494787301:role/service-role/codebuild-ecommerce-microservice-service-role
       - export KUBECONFIG=/root/.kube/config
       - kubectl get nodes
       - echo Updating Kubernetes deployments with new images...
