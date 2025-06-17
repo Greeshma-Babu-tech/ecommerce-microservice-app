@@ -58,6 +58,7 @@ phases:
       
   post_build:
     commands:
+      - aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
       - echo Applying initial deployments...
       - kubectl apply -f k8s-manifests/user-deployment.yaml
       - kubectl apply -f k8s-manifests/product-deployment.yaml
